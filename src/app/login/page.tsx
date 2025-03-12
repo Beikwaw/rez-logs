@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 interface LoginPageProps {
-    userType: string;
+    userType: 'student' | 'admin';
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
     const router = useRouter();
-    const [role, setRole] = useState(userType);
+    const [role, setRole] = useState<'student' | 'admin'>(userType);
 
     useEffect(() => {
         setRole(userType);
