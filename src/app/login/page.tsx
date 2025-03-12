@@ -1,54 +1,24 @@
-'use client';
+import Link from 'next/link';
+import React from 'react';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Updated import
-
-interface LoginPageProps {
-    userType: 'student' | 'admin';
+export default function LoginPage() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <h1 className="text-2xl font-bold mb-6">Login Page</h1>
+      <div className="flex flex-col gap-4 w-full max-w-md">
+        <Link 
+          href="/admin" 
+          className="px-6 py-3 bg-blue-600 text-white rounded-md text-center hover:bg-blue-700 transition-colors"
+        >
+          Login as Admin
+        </Link>
+        <Link 
+          href="/student" 
+          className="px-6 py-3 bg-green-600 text-white rounded-md text-center hover:bg-green-700 transition-colors"
+        >
+          Login as Student
+        </Link>
+      </div>
+    </div>
+  );
 }
-
-const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
-    const router = useRouter();
-    const [role, setRole] = useState<'student' | 'admin'>(userType);
-
-    useEffect(() => {
-        setRole(userType);
-    }, [userType]);
-
-    const handleLogin = () => {
-        if (role === 'admin') {
-            router.push('/admin');
-        } else {
-            router.push('/student');
-        }
-    };
-
-    return (
-        <div>
-            <h1>Login Page</h1>
-            <div>
-                <label>
-                    <input
-                        type="radio"
-                        value="student"
-                        checked={role === 'student'}
-                        onChange={() => setRole('student')}
-                    />
-                    Student
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        value="admin"
-                        checked={role === 'admin'}
-                        onChange={() => setRole('admin')}
-                    />
-                    Admin
-                </label>
-            </div>
-            <button onClick={handleLogin}>Login</button>
-        </div>
-    );
-};
-
-export default LoginPage;
