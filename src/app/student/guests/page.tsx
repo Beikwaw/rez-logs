@@ -4,57 +4,57 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from 'lucide-react';
-import { MaintenanceRequestForm } from '@/components/forms/MaintenanceRequestForm';
+import { GuestRegistrationForm } from '@/components/forms/GuestRegistrationForm';
 import { useAuth } from '@/context/AuthContext';
-import { getMaintenanceRequests, type MaintenanceRequest } from '@/lib/firestore';
+import { getGuestRegistrations, type GuestRegistration } from '@/lib/firestore';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
-export default function MaintenancePage() {
+export default function GuestsPage() {
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
+  const [registrations, setRegistrations] = useState<GuestRegistration[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchRequests = async () => {
+  const fetchRegistrations = async () => {
     if (!user) return;
     try {
-      const allRequests = await getMaintenanceRequests();
-      const userRequests = allRequests.filter(req => req.userId === user.uid);
-      setRequests(userRequests);
+      const allRegistrations = await getGuestRegistrations();
+      const userRegistrations = allRegistrations.filter(reg => reg.userId === user.uid);
+      setRegistrations(userRegistrations);
     } catch (error) {
-      console.error('Error fetching maintenance requests:', error);
+      console.error('Error fetching guest registrations:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRequests();
+    fetchRegistrations();
   }, [user]);
 
   const handleSuccess = () => {
     setShowForm(false);
-    fetchRequests();
+    fetchRegistrations();
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Maintenance Requests</h1>
+        <h1 className="text-3xl font-bold">Guest Registrations</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          New Request
+          Register Guest
         </Button>
       </div>
 
       {showForm && (
         <Card>
           <CardHeader>
-            <CardTitle>New Maintenance Request</CardTitle>
+            <CardTitle>Register New Guest</CardTitle>
           </CardHeader>
           <CardContent>
-            <MaintenanceRequestForm
+            <GuestRegistrationForm
               userId={user?.uid || ''}
               onSuccess={handleSuccess}
               onCancel={() => setShowForm(false)}
@@ -65,42 +65,38 @@ export default function MaintenancePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Maintenance Requests</CardTitle>
+          <CardTitle>Your Guest Registrations</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-muted-foreground">Loading requests...</p>
-          ) : requests.length === 0 ? (
-            <p className="text-muted-foreground">No maintenance requests found.</p>
+            <p className="text-muted-foreground">Loading registrations...</p>
+          ) : registrations.length === 0 ? (
+            <p className="text-muted-foreground">No guest registrations found.</p>
           ) : (
             <div className="space-y-4">
-              {requests.map((request) => (
+              {registrations.map((registration) => (
                 <div
-                  key={request.id}
+                  key={registration.id}
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="space-y-1">
-                    <p className="font-medium">{request.title}</p>
-                    <p className="text-sm text-muted-foreground">{request.description}</p>
+                    <p className="font-medium">{registration.guestName}</p>
+                    <p className="text-sm text-muted-foreground">{registration.guestEmail}</p>
                     <div className="flex items-center gap-2">
                       <Badge variant={
-                        request.status === 'completed' ? 'default' :
-                        request.status === 'in_progress' ? 'secondary' :
-                        'outline'
+                        registration.status === 'approved' ? 'default' :
+                        registration.status === 'pending' ? 'secondary' :
+                        'destructive'
                       }>
-                        {request.status}
+                        {registration.status}
                       </Badge>
-                      <Badge variant={
-                        request.priority === 'high' ? 'destructive' :
-                        request.priority === 'medium' ? 'secondary' :
-                        'outline'
-                      }>
-                        {request.priority} priority
-                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {format(registration.visitDate, 'MMM d, yyyy')} at {registration.visitTime}
+                      </span>
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {format(request.createdAt, 'MMM d, yyyy')}
+                    {format(registration.createdAt, 'MMM d, yyyy')}
                   </div>
                 </div>
               ))}

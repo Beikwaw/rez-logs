@@ -9,13 +9,19 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from 'next/link';
 
-export default function DashboardLayout({
+export default function StudentLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const { user, userData, logout } = useAuth();
   const router = useRouter();
+
+  React.useEffect(() => {
+    if (!user || (userData && userData.role !== 'student')) {
+      router.push('/portals/student');
+    }
+  }, [user, userData, router]);
 
   if (!userData) {
     return (
@@ -25,10 +31,16 @@ export default function DashboardLayout({
     );
   }
 
+  if (userData.role !== 'student') {
+    // This shouldn't render because the useEffect should redirect,
+    // but it's a safety measure
+    return null;
+  }
+
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/login');
+      router.push('/portals/student');
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -67,38 +79,38 @@ export default function DashboardLayout({
       <div className="flex-1 flex">
         <aside className="w-64 border-r bg-background">
           <nav className="space-y-1 p-4">
-            <Link href="/dashboard">
+            <Link href="/student">
               <Button variant="ghost" className="w-full justify-start">
                 <Home className="mr-2 h-4 w-4" />
                 Dashboard
               </Button>
             </Link>
-            <Link href="/dashboard/maintenance">
+            <Link href="/student/maintenance">
               <Button variant="ghost" className="w-full justify-start">
                 <Wrench className="mr-2 h-4 w-4" />
                 Maintenance
               </Button>
             </Link>
-            <Link href="/dashboard/complaints">
+            <Link href="/student/complaints">
               <Button variant="ghost" className="w-full justify-start">
                 <AlertCircle className="mr-2 h-4 w-4" />
                 Complaints
               </Button>
             </Link>
-            <Link href="/dashboard/guest">
+            <Link href="/student/guests">
               <Button variant="ghost" className="w-full justify-start">
                 <Users className="mr-2 h-4 w-4" />
                 Guest Management
               </Button>
             </Link>
-            <Link href="/dashboard/sleepover">
+            <Link href="/student/sleepovers">
               <Button variant="ghost" className="w-full justify-start">
                 <Calendar className="mr-2 h-4 w-4" />
                 Sleepover Requests
               </Button>
             </Link>
             <Separator className="my-4" />
-            <Link href="/dashboard/settings">
+            <Link href="/student/settings">
               <Button variant="ghost" className="w-full justify-start">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings

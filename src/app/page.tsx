@@ -44,7 +44,7 @@ export default function HomePage() {
                 <p className="text-center text-muted-foreground">
                   Access your student dashboard, submit requests, and manage your accommodation
                 </p>
-                <Link href="/login" className="w-full">
+                <Link href="/portals/student" className="w-full">
                   <Button size="lg" className="w-full">
                     Login as Student
                   </Button>
@@ -63,7 +63,7 @@ export default function HomePage() {
                 <p className="text-center text-muted-foreground">
                   Manage users, handle requests, and oversee the student living facility
                 </p>
-                <Link href="/admin/login" className="w-full">
+                <Link href="/portals/admin" className="w-full">
                   <Button size="lg" className="w-full">
                     Login as Admin
                   </Button>

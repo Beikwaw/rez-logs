@@ -19,7 +19,7 @@ export default function AdminLayout({
 
   React.useEffect(() => {
     if (!loading && (!userData || userData.role !== 'admin')) {
-      router.push('/login');
+      router.push('/admin/login');
     }
   }, [userData, loading, router]);
 
@@ -38,7 +38,7 @@ export default function AdminLayout({
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/login');
+      router.push('/admin/login');
     } catch (error) {
       console.error('Error logging out:', error);
     }

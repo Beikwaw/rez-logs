@@ -71,6 +71,20 @@ export interface MaintenanceRequest {
   adminResponse?: string;
 }
 
+export interface GuestRegistration {
+  id: string;
+  userId: string;
+  guestName: string;
+  guestEmail: string;
+  visitDate: string;
+  visitTime: string;
+  purpose: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: Date;
+  updatedAt: Date;
+  adminResponse?: string;
+}
+
 export const createUser = async (
   userData: Omit<UserData, 'createdAt' | 'applicationStatus'> & {
     requestDetails?: Omit<NonNullable<UserData['requestDetails']>, 'dateSubmitted'>;
@@ -301,4 +315,28 @@ export const updateMaintenanceRequestStatus = async (requestId: string, status: 
     adminResponse,
     updatedAt: new Date()
   });
+};
+
+export const createGuestRegistration = async (registration: Omit<GuestRegistration, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const registrationsRef = collection(db, 'guest_registrations');
+  const now = new Date();
+  
+  const docRef = await addDoc(registrationsRef, {
+    ...registration,
+    createdAt: now,
+    updatedAt: now
+  });
+
+  return docRef.id;
+};
+
+export const getGuestRegistrations = async () => {
+  const registrationsRef = collection(db, 'guest_registrations');
+  const registrationsSnap = await getDocs(registrationsRef);
+  return registrationsSnap.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt.toDate(),
+    updatedAt: doc.data().updatedAt.toDate()
+  })) as GuestRegistration[];
 }; 
