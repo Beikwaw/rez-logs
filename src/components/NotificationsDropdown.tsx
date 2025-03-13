@@ -54,7 +54,7 @@ export function NotificationsDropdown() {
         getMaintenanceRequests(),
         getComplaints(),
         getSleepoverRequests(),
-        getGuestRegistrations()
+        getGuestRegistrations(user.uid)
       ]);
 
       const allNotifications: Notification[] = [
