@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from 'next/link';
+import { NotificationsDropdown } from '@/components/NotificationsDropdown';
+import { ChatDialog } from '@/components/ChatDialog';
 
 export default function StudentLayout({
   children,
@@ -57,12 +59,8 @@ export default function StudentLayout({
             <span className="font-bold text-xl">My Domain Student Living</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <MessageSquare className="h-5 w-5" />
-            </Button>
+            <NotificationsDropdown />
+            <ChatDialog />
             <Separator orientation="vertical" className="h-8" />
             <Avatar>
               <AvatarImage src={user?.photoURL || undefined} />

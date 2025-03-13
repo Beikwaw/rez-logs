@@ -19,8 +19,7 @@ export default function GuestsPage() {
   const fetchRegistrations = async () => {
     if (!user) return;
     try {
-      const allRegistrations = await getGuestRegistrations();
-      const userRegistrations = allRegistrations.filter(reg => reg.userId === user.uid);
+      const userRegistrations = await getGuestRegistrations(user.uid);
       setRegistrations(userRegistrations);
     } catch (error) {
       console.error('Error fetching guest registrations:', error);

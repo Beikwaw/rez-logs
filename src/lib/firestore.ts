@@ -330,9 +330,10 @@ export const createGuestRegistration = async (registration: Omit<GuestRegistrati
   return docRef.id;
 };
 
-export const getGuestRegistrations = async () => {
+export const getGuestRegistrations = async (userId: string) => {
   const registrationsRef = collection(db, 'guest_registrations');
-  const registrationsSnap = await getDocs(registrationsRef);
+  const registrationsQuery = query(registrationsRef, where('userId', '==', userId));
+  const registrationsSnap = await getDocs(registrationsQuery);
   return registrationsSnap.docs.map(doc => ({
     id: doc.id,
     ...doc.data(),
