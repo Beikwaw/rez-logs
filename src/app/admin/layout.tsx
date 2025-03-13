@@ -79,7 +79,7 @@ export default function AdminLayout({
             <Link href="/admin/users">
               <Button variant="ghost" className="w-full justify-start">
                 <Users className="mr-2 h-4 w-4" />
-                User Management
+                Users
               </Button>
             </Link>
             <Link href="/admin/complaints">
