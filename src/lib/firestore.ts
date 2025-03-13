@@ -135,15 +135,15 @@ export const getAllUsers = async () => {
     return {
       id: doc.id,
       ...data,
-      createdAt: data.createdAt.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
       requestDetails: data.requestDetails ? {
         ...data.requestDetails,
-        dateSubmitted: data.requestDetails.dateSubmitted.toDate()
+        dateSubmitted: data.requestDetails.dateSubmitted?.toDate() || new Date()
       } : undefined,
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
-        timestamp: log.timestamp.toDate()
-      }))
+        timestamp: log.timestamp?.toDate() || new Date()
+      })) || []
     } as UserData;
   });
 };

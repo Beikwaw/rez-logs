@@ -23,7 +23,7 @@ interface AuthContextType {
     accommodationType: string;
     location: string;
   }) => Promise<void>;
-  login: (email: string, password: string, userType: 'student' | 'admin') => Promise<void>;
+  login: (email: string, password: string, userType: 'student' | 'admin', rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -60,6 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }))
             };
             setUserData(serializedData);
+            
+            // Set cookies if they don't exist (for persistent login)
+            if (!Cookies.get('userType')) {
+              Cookies.set('userType', data.role);
+            }
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -67,6 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         setUserData(null);
+        // Clear cookies on logout/session end
+        Cookies.remove('userType');
       }
       setLoading(false);
     });
@@ -104,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string, userType: 'student' | 'admin') => {
+  const login = async (email: string, password: string, userType: 'student' | 'admin', rememberMe = false) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const { user } = userCredential;
@@ -138,6 +145,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }))
       };
       setUserData(serializedData);
+
+      // Set cookies with appropriate expiration
+      const options = rememberMe ? { expires: 30 } : undefined; // 30 days if remember me is checked
+      Cookies.set('userType', userType, options);
     } catch (error) {
       console.error('Login error:', error);
       throw error;

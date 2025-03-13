@@ -8,12 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { UserCircle, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function StudentPortalPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
@@ -29,7 +31,7 @@ export default function StudentPortalPage() {
     setIsLoading(true);
     
     try {
-      await login(email, password, 'student');
+      await login(email, password, 'student', rememberMe);
       toast.success('Login successful');
       router.push('/student');
     } catch (error) {
@@ -91,6 +93,19 @@ export default function StudentPortalPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked: boolean) => setRememberMe(checked)}
+                />
+                <Label
+                  htmlFor="remember"
+                  className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Remember me
+                </Label>
               </div>
               <Button 
                 type="submit" 

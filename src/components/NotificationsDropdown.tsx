@@ -5,7 +5,7 @@ import {
   Bell,
   CheckCircle,
   Calendar,
-  Tool,
+  Wrench,
   MessageCircle,
   UserPlus,
   X
@@ -126,7 +126,7 @@ export function NotificationsDropdown() {
   const getIcon = (type: Notification['type']) => {
     switch (type) {
       case 'maintenance':
-        return <Tool className="h-4 w-4" />;
+        return <Wrench className="h-4 w-4" />;
       case 'complaint':
         return <MessageCircle className="h-4 w-4" />;
       case 'sleepover':
