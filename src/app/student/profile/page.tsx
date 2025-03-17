@@ -183,4 +183,4 @@ export default function StudentProfilePage() {
       </Card>
     </div>
   );
-} 
+}
