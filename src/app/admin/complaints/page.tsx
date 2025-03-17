@@ -32,7 +32,7 @@ export default function ComplaintsPage() {
     }
   };
 
-  const handleStatusUpdate = async (id: string, status: boolean, adminResponse?: string) => {
+  const handleStatusUpdate = async (id: string, status: string, adminResponse?: string) => {
     try {
       await modifyComplaintStatus(id, status, adminResponse);
       await fetchComplaints();
@@ -214,6 +214,6 @@ export default function ComplaintsPage() {
   );
 } 
 
-function modifyComplaintStatus(id: string, status: boolean, adminResponse: string | undefined) {
+function modifyComplaintStatus(id: string, status: string, adminResponse: string | undefined) {
   throw new Error('Function not implemented.');
 }
