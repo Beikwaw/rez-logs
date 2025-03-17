@@ -377,7 +377,7 @@ export async function assignStaffToComplaint(complaintId: string, staffId: strin
 }
 
 export async function getAllMaintenanceRequests() {
-  const maintenanceRef = collection(db, 'maintenance');
+  const maintenanceRef = collection(db, 'maintenance_requests');
   const q = query(maintenanceRef, orderBy('createdAt', 'desc'));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({
@@ -409,7 +409,7 @@ export async function assignStaffToMaintenance(maintenanceId: string, staffId: s
 }
 
 export async function getAllSleepoverRequests() {
-  const sleepoverRef = collection(db, 'sleepover');
+  const sleepoverRef = collection(db, 'sleepover_requests');
   const q = query(sleepoverRef, orderBy('createdAt', 'desc'));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({
@@ -508,7 +508,7 @@ export async function getMyGuestRequests(userId:string){
 }
 
 export async function getMyMaintenanceRequests(userId:string){
-  const maintenanceRef = collection(db, 'maintenance');
+  const maintenanceRef = collection(db, 'maintenance_requests');
   const q = query(maintenanceRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({

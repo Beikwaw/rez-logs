@@ -85,10 +85,11 @@ export default function SignUpPage() {
         place_of_study: formData.place_of_study,
         room_number: formData.room_number,
         tenant_code: formData.tenant_code,
-        role: "student", // Default role
+        role: "new-student", // Default role
+        status: "pending", // Default status
       }
 
-      await setDoc(doc(db, "profiles", user.uid), profileData)
+      await setDoc(doc(db, "users", user.uid), profileData)
 
       setSuccess(true)
       toast.success("Account created successfully. You can now log in with your credentials")
