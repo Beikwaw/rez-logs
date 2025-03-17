@@ -96,7 +96,7 @@ export default function SignUpPage() {
 
       // Redirect after 3 seconds
       setTimeout(() => {
-        router.push("/login")
+        router.push("/portals/student")
       }, 3000)
     } catch (error: any) {
       console.error("Signup error:", error)
