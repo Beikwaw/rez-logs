@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building, Shield, CreditCard, Moon, UserPlus, Wrench, TriangleAlert } from 'lucide-react';
+import { Building, Shield, CreditCard, Moon, UserPlus, Wrench, TriangleAlert, Mail } from 'lucide-react';
 import { getMyComplaints, getMyGuestRequests, getMySleepoverRequests, getMyMaintenanceRequests, getAnnouncements } from '@/lib/firestore';
 
 export default function DashboardPage() {
@@ -214,16 +214,31 @@ export default function DashboardPage() {
                 </div>
                 
               </div>
-              <div>
-                <h3 className="font-medium">Maintenance Office</h3>
-                <p className="text-sm text-muted-foreground">
-                  Email:
-                  <a href="mailto:example@gmail.com" className="text-primary"> example@gmail.com</a>
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Phone:
-                  <a href="tel:+1234567890" className="text-primary"> +1234567890</a>
-                </p>
+              <div className='flex items-center gap-4'>
+                <div className='flex items-center bg-gray-200 p-2 rounded-full'>
+                  <Shield className="h-6 w-6 text-muted-foreground" color='black'/>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h3 className="font-medium">Security and Reception</h3>
+                  <p className="text-sm text-muted-foreground">   
+                    Email:
+                    <a href="mailto:obs@mydomainliving.co.za" className="text-primary"> 087 897 9085</a>
+                  </p>
+                </div>
+                
+              </div>
+              <div className='flex items-center gap-4'>
+                <div className='flex items-center bg-gray-200 p-2 rounded-full'>
+                  <CreditCard className="h-6 w-6 text-muted-foreground" color='black'/>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h3 className="font-medium">Finance</h3>
+                  <p className="text-sm text-muted-foreground">   
+                    Email:                    
+                    <a href="mailto:carmen@swish.co.za" className="text-primary"> carmen@swish.co.za</a>
+                  </p>
+                </div>
+                
               </div>
             </div>
           </CardContent>

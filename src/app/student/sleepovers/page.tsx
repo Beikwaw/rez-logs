@@ -41,7 +41,7 @@ export default function SleepoversPage() {
         <h1 className="text-3xl font-bold">Sleepover Requests</h1>
 
       </div>
-      <div className='flex flex-row w-full gap-5'>
+      <div className='flex flex-col md:flex-row w-full  gap-5'>
         <Card className='w-full md:w-[50%]'>
           <CardHeader className='flex flex-row items-center'>
             <Moon className='h-6 w-6'/>

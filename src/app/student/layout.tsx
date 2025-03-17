@@ -167,6 +167,10 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                     Settings
                   </Button>
                 </Link>
+                <Button variant="ghost" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
               </nav>
             </aside>
             <div className="fixed top-0 right-0 w-[30%] h-full bg-black/40 z-40" onClick={() => setShowSidebar(false)}></div>

@@ -44,7 +44,7 @@ export default function ComplaintsPage() {
         <h1 className="text-3xl font-bold">Complaints</h1>
       </div>
 
-      <div className='flex flex-row w-full gap-5'>
+      <div className='flex flex-col md:flex-row w-full gap-5'>
         <Card className='w-full md:w-[50%]'>
           <CardHeader className='flex flex-row items-center'>
             <TriangleAlert className='h-6 w-6'/>

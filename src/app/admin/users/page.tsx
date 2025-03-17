@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAllUsers, processRequest, updateUser, UserData } from '@/lib/firestore';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function UsersPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -26,7 +27,7 @@ export default function UsersPage() {
       setUsers(fetchedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
+      toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -38,11 +39,11 @@ export default function UsersPage() {
       setProcessingId(userId);
       const message = `Your application has been ${status}`;
       await processRequest(userId, status, message, user.uid || '');
-      toast.success(`Application ${status}`);
+      toast.success(`The application has been ${status} successfully.`);
       await fetchUsers();
     } catch (error) {
       console.error('Error processing application:', error);
-      toast.error('Failed to process application');
+      toast.error("Failed to process application");
     } finally {
       setProcessingId(null);
     }
@@ -53,11 +54,11 @@ export default function UsersPage() {
       setProcessingId(userId);
       const newRole = currentRole === 'admin' ? 'student' : 'admin';
       await updateUser(userId, { role: newRole });
-      toast.success(`User role updated to ${newRole}`);
+      toast.success("User role updated");
       await fetchUsers();
     } catch (error) {
       console.error('Error updating user role:', error);
-      toast.error('Failed to update user role');
+      toast.error("Failed to update user role");
     } finally {
       setProcessingId(null);
     }

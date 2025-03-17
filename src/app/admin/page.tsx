@@ -17,6 +17,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, AlertCircle, Calendar, Wrench, CheckCircle, XCircle } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 
 export default function AdminDashboardPage() {
@@ -149,68 +150,31 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {pendingApplications.slice(0, 3).map(app => (
-              <div key={app.id} className="flex items-center space-x-4">
-                <div className="bg-green-100 p-2 rounded-full">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">New application from {app.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Submitted {format(app.createdAt, 'MMM d, yyyy')}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {sleepoverRequests.slice(0, 3).map(req => (
-              <div key={req.id} className="flex items-center space-x-4">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Sleepover request for {req.guestName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {format(req.startDate, 'MMM d')} - {format(req.endDate, 'MMM d, yyyy')}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {complaints.slice(0, 3).map(complaint => (
-              <div key={complaint.id} className="flex items-center space-x-4">
-                <div className="bg-yellow-100 p-2 rounded-full">
-                  <AlertCircle className="h-4 w-4 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{complaint.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Submitted {format(complaint.createdAt, 'MMM d, yyyy')}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {maintenanceRequests.slice(0, 3).map(req => (
-              <div key={req.id} className="flex items-center space-x-4">
-                <div className="bg-purple-100 p-2 rounded-full">
-                  <Wrench className="h-4 w-4 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{req.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Priority: {req.priority}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="sleepover" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="sleepover">Sleepover Requests</TabsTrigger>
+          <TabsTrigger value="announcements">Announcements</TabsTrigger>
+          <TabsTrigger value="complaints">Complaints</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sleepover" className="space-y-4">
+          {/* <SleepoverManagement /> */}
+        </TabsContent>
+
+        <TabsContent value="announcements" className="space-y-4">
+          {/* <AnnouncementManagement /> */}
+        </TabsContent>
+
+        <TabsContent value="complaints" className="space-y-4">
+          {/* <ComplaintManagement /> */}
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-4">
+          {/* <UserManagement /> */}
+        </TabsContent>
+      </Tabs>
     </div>
   );
-} 
+}

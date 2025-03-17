@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Open_Sans } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import { AuthProvider } from '@/context/AuthContext'
 import {Toaster} from '@/components/ui/sonner'
 import './globals.css'
 
-
-
-const OpenSans = Open_Sans({
-  variable: "--font-Open_Sans",
-  subsets: ["latin"],
-});
+const poppins = Poppins({
+  subsets: ['latin'], // Specify the subsets here
+  preload: true,
+  weight: ['400', '500', '600', '700', '800']
+})
 
 export const metadata: Metadata = {
   title: "MDO Student Living",
@@ -26,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${OpenSans.variable} antialiased`}
+        className={`${poppins.className} antialiased`}
       >
         <AuthProvider>
           {children}

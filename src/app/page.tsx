@@ -5,8 +5,7 @@ export const dynamic = 'force-dynamic'
 import React from 'react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, UserCircle } from "lucide-react";
+import { Shield, Lock, User, ArrowRight } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -24,58 +23,36 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center bg-black/40 h-full w-full flex-col">
-
-
-        <div className="w-full max-w-4xl pt-4">
+      <main className="flex-1 flex items-center justify-center bg-black/40 h-full w-full flex-col gap-5">
+        <div className="w-full max-w-4xl pt-4 text-center">
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-6xl text-white font-bold  p-2">Welcome to My Domain</h1>
-            <p className="text-xl text-muted-foreground">Choose your portal to continue</p>
+            <h1 className="text-2xl md:text-5xl lg:text-6xl text-white font-bold  p-2">Welcome to My Domain</h1>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 pb-4">
-            <Card className="hover:shadow-lg transition-shadow mx-5 md:mx-0">
-              <CardHeader className="text-center pb-2">
-                <CardTitle className="text-2xl">Student Portal</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center space-y-4">
-                <div className="bg-primary/10 p-4 rounded-full">
-                  <UserCircle className="h-12 w-12 text-primary" />
-                </div>
-                <p className="text-center text-muted-foreground">
-                  Access your student dashboard, submit requests, and manage your accommodation
-                </p>
-                <Link href="/portals/student" className="w-full">
-                  <Button size="lg" className="w-full">
-                    Login as Student
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow mx-5 md:mx-0">
-              <CardHeader className="text-center pb-2">
-                <CardTitle className="text-2xl">Admin Portal</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center space-y-4">
-                <div className="bg-primary/10 p-4 rounded-full">
-                  <Shield className="h-12 w-12 text-primary" />
-                </div>
-                <p className="text-center text-muted-foreground">
-                  Manage users, handle requests, and oversee the student living facility
-                </p>
-                <Link href="/portals/admin" className="w-full">
-                  <Button size="lg" className="w-full">
-                    Login as Admin
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="flex flex-col md:flex-row gap-5 justify-center items-center">
+            <Link href="/portals/admin" className="w-fit">
+              <Button size="lg" className="w-fit font-normal text-[14px] md:text-[18px] lg:text-[20px] p-6 px-8  bg-[#dc2625] hover:bg-[#dc2625]/70">
+                <Lock className="h-6 w-6 text-white" />
+                Admin Portal
+              </Button>
+            </Link>
+            <Link href="/portals/student" className="w-fit">
+              <Button size="lg" className="w-fit font-normal text-[14px] md:text-[18px] lg:text-[20px] p-6 px-8 bg-[#3c82f5] hover:bg-[#3c82f5]/70">
+                <User className="h-8 w-8 text-white" />
+                Student Portal
+              </Button>
+            </Link>
           </div>
+
+         
         </div>
+        <Link href="/register" className="text-white text-lg hover:underline mt-4">
+            New user ? Register here  
+            <ArrowRight className="h-5 w-5 text-white inline" />
+          </Link>
       </main>
 
-      <footer className="border-t py-2 bg-secondary text-black px-5 flex items-center justify-center">
+      <footer className="border-t py-2 text-white px-5 flex items-center justify-center">
         <div className="container  w-full flex flex-col items-center justify-between gap-4  md:flex-row">
           <p className="text-center text-sm leading-loose md:text-left">
             © 2025 My Domain Student Living. All rights reserved.
