@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               name: data.name,
               role: data.role,
               createdAt: data.createdAt?.toDate() || new Date(),
+              updatedAt: data.updatedAt?.toDate() || new Date(),
               applicationStatus: data.applicationStatus,
               requestDetails: data.requestDetails ? {
                 ...data.requestDetails,
@@ -134,6 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: data.name,
         role: data.role,
         createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
         applicationStatus: data.applicationStatus,
         requestDetails: data.requestDetails ? {
           ...data.requestDetails,

@@ -518,3 +518,17 @@ export async function getMyMaintenanceRequests(userId:string){
   }));
 }
 
+export async function getRequestDetails(requestId: string) {
+  // Implement the logic to fetch request details by ID
+  // This is a placeholder implementation
+  return {
+    id: requestId,
+    title: 'Sample Request',
+    userName: 'John Doe',
+    roomNumber: '101',
+    description: 'Sample description',
+    priority: 'High',
+    status: 'pending',
+  };
+}
+

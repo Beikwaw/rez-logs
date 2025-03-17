@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
-import { Eye, UserPlus, RefreshCw, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Eye, UserPlus, RefreshCw, CheckCircle, XCircle, Clock, AlertCircle, Wrench, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface RequestActionsProps {
@@ -285,4 +285,4 @@ export function RequestActions({
       </DialogContent>
     </Dialog>
   );
-} 
+}

@@ -22,18 +22,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (userData) {
-      getMyComplaints(userData.name).then(complaints => {
-        setMyComplaintsCount(complaints.length);
-      });
-      getMyGuestRequests(userData.name).then(guestRequests => {
-        setMyGuestRequestsCount(guestRequests.length);
-      });
-      getMySleepoverRequests(userData.name).then(sleepoverRequests => {
-        setMySleepoverRequestsCount(sleepoverRequests.length);
-      });
-      getMyMaintenanceRequests(userData.name).then(maintenanceRequests => {
-        setMyMaintenanceRequestsCount(maintenanceRequests.length);
-      });
+      if (userData.id) {
+        getMyComplaints(userData.id).then(complaints => {
+          setMyComplaintsCount(complaints.length);
+        });
+        getMyGuestRequests(userData.id).then(guestRequests => {
+          setMyGuestRequestsCount(guestRequests.length);
+        });
+        getMySleepoverRequests(userData.id).then(sleepoverRequests => {
+          setMySleepoverRequestsCount(sleepoverRequests.length);
+        });
+        getMyMaintenanceRequests(userData.id).then(maintenanceRequests => {
+          setMyMaintenanceRequestsCount(maintenanceRequests.length);
+        });
+      }
 
       getAnnouncements().then(announcements => {
         setAnnouncements(announcements);

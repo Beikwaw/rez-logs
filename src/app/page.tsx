@@ -4,37 +4,32 @@ export const dynamic = 'force-dynamic'
 
 import React from 'react';
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, UserCircle } from "lucide-react";
-import Banner from "@/assets/main-bg-image.jpg"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="sticky px-5 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen flex flex-col bg-[url(../assets/bgmain.jpg)]  bg-cover bg-center  ">
+      <header className="sticky px-5 top-0 z-50 w-full border-b bg-black  backdrop-blur supports-[backdrop-filter]:bg-black/60">
         <div className="container flex h-16 items-center ">
           <div className="mr-4 flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <div className="bg-primary rounded-full w-8 h-8 flex items-center justify-center">
                 <Shield className="h-4 w-4 text-white" />
               </div>
-              <span className="font-bold text-xl">My Domain Student Living</span>
+              <span className="font-bold text-xl text-white">My Domain Student Living</span>
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center flex-col">
-        <div className="w-full bg-[url(../assets/main-bg-image.jpg)] bg-cover bg-center h-[200px] flex items-center justify-center">
-          <div className="text-center bg-black/40 h-full w-full flex items-center justify-center">
-            <h1 className="text-2xl md:text-6xl text-white font-bold  p-2">Welcome to My Domain</h1>
-          </div>
-        </div>
+      <main className="flex-1 flex items-center justify-center bg-black/40 h-full w-full flex-col">
+
 
         <div className="w-full max-w-4xl pt-4">
           <div className="text-center mb-8">
+            <h1 className="text-2xl md:text-6xl text-white font-bold  p-2">Welcome to My Domain</h1>
             <p className="text-xl text-muted-foreground">Choose your portal to continue</p>
           </div>
 
@@ -80,8 +75,8 @@ export default function HomePage() {
         </div>
       </main>
 
-      <footer className="border-t py-6 bg-secondary text-black px-5 flex items-center justify-center">
-        <div className="container  w-full flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
+      <footer className="border-t py-2 bg-secondary text-black px-5 flex items-center justify-center">
+        <div className="container  w-full flex flex-col items-center justify-between gap-4  md:flex-row">
           <p className="text-center text-sm leading-loose md:text-left">
             © 2025 My Domain Student Living. All rights reserved.
           </p>

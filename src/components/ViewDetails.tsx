@@ -1,9 +1,19 @@
 import React from 'react';
-import { getGuestRegistrations, getComplaints, getMaintenanceRequests, getSleepoverRequests } from '@/lib/firestore';
+import { getRequestDetails } from '@/lib/firestore';
 
 export default function ViewDetails({ requestId }: { requestId: string }) {
-  const [details, setDetails] = React.useState(null);
-  const [error, setError] = React.useState(null);
+  type RequestDetails = {
+    id: string;
+    title: string;
+    userName: string;
+    roomNumber: string;
+    description: string;
+    priority: string;
+    status: string;
+  };
+
+  const [details, setDetails] = React.useState<RequestDetails | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchDetails = async () => {
@@ -11,7 +21,7 @@ export default function ViewDetails({ requestId }: { requestId: string }) {
         const data = await getRequestDetails(requestId);
         setDetails(data);
       } catch (err) {
-        if (err.code === 'permission-denied') {
+        if ((err as any).code === 'permission-denied') {
           setError('Missing or insufficient permissions.');
         } else {
           setError('An unexpected error occurred.');
