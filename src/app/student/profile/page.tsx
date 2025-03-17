@@ -21,9 +21,6 @@ export default function StudentProfilePage() {
     email: '',
     phone: '',
     roomNumber: '',
-    department: '',
-    level: '',
-    matricNumber: '',
   });
 
   useEffect(() => {
@@ -34,13 +31,10 @@ export default function StudentProfilePage() {
         const userData = await getUserById(user.uid);
         if (userData) {
           setFormData({
-            name: userData.name,
-            email: userData.email,
-            phone: userData.phone,
-            roomNumber: userData.roomNumber,
-            department: userData.department,
-            level: userData.level,
-            matricNumber: userData.matricNumber,
+            name: userData.name || '',
+            email: userData.email || '',
+            phone: userData.phone || '',
+            roomNumber: userData.roomNumber || '',
           });
         }
       } catch (error) {
@@ -132,36 +126,6 @@ export default function StudentProfilePage() {
                   id="roomNumber"
                   name="roomNumber"
                   value={formData.roomNumber}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="department">Department</Label>
-                <Input
-                  id="department"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="level">Level</Label>
-                <Input
-                  id="level"
-                  name="level"
-                  value={formData.level}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="matricNumber">Matric Number</Label>
-                <Input
-                  id="matricNumber"
-                  name="matricNumber"
-                  value={formData.matricNumber}
                   onChange={handleChange}
                   required
                 />

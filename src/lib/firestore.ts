@@ -19,21 +19,23 @@ import { db } from './firebase';
 const USERS_COLLECTION = 'users';
 
 export interface UserData {
-  applicationStatus: string;
   id: string;
-  name: string;
   email: string;
-  phone: string;
-  roomNumber: string;
-  department: string;
-  level: string;
-  matricNumber: string;
+  name?: string;
+  phone?: string;
   role: 'student' | 'admin';
   createdAt: Date;
   updatedAt: Date;
-  communicationLog: {
-    type: 'complaint' | 'maintenance' | 'sleepover' | 'guest';
+  applicationStatus?: 'accepted' | 'denied' | 'pending';
+  roomNumber?: string;
+  requestDetails?: {
+    accommodationType: string;
+    location: string;
+    dateSubmitted: Date;
+  };
+  communicationLog?: {
     message: string;
+    sentBy: 'admin' | 'student';
     timestamp: Date;
   }[];
 }
