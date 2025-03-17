@@ -11,12 +11,16 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { UserCircle, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 export default function StudentPortalPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
@@ -43,6 +47,21 @@ export default function StudentPortalPage() {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const auth = getAuth();
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetMessage('Password reset email sent!');
+    } catch (error) {
+      if (error instanceof Error) {
+        setResetMessage(`Error: ${error.message}`);
+      } else {
+        setResetMessage('An unknown error occurred');
+      }
     }
   };
 
@@ -82,9 +101,13 @@ export default function StudentPortalPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link href="#" className="text-xs text-primary hover:underline">
+                  <button
+                    type="button"
+                    className="text-xs text-primary hover:underline"
+                    onClick={() => setShowResetPassword(true)}
+                  >
                     Forgot password?
-                  </Link>
+                  </button>
                 </div>
                 <Input 
                   id="password" 
@@ -127,7 +150,36 @@ export default function StudentPortalPage() {
             </div>
           </CardFooter>
         </Card>
+
+        {showResetPassword && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h2 className="text-xl mb-4 text-center">Forgot Password?</h2>
+              <form onSubmit={handlePasswordReset} className="flex flex-col items-center space-y-4">
+                <Input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="p-2 border rounded"
+                  required
+                />
+                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                  Reset Password
+                </Button>
+              </form>
+              {resetMessage && <p className="mt-4 text-center">{resetMessage}</p>}
+              <Button
+                type="button"
+                className="mt-4 w-full bg-gray-600 hover:bg-gray-700"
+                onClick={() => setShowResetPassword(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-} 
+}

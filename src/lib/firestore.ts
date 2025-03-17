@@ -10,27 +10,30 @@ import {
   deleteDoc,
   arrayUnion,
   Timestamp,
-  addDoc
+  addDoc,
+  orderBy,
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
 
 const USERS_COLLECTION = 'users';
 
 export interface UserData {
+  applicationStatus: string;
   id: string;
+  name: string;
   email: string;
-  name?: string;
+  phone: string;
+  roomNumber: string;
+  department: string;
+  level: string;
+  matricNumber: string;
   role: 'student' | 'admin';
   createdAt: Date;
-  applicationStatus?: 'pending' | 'accepted' | 'denied';
-  requestDetails?: {
-    accommodationType: string;
-    location: string;
-    dateSubmitted: Date;
-  };
-  communicationLog?: {
+  updatedAt: Date;
+  communicationLog: {
+    type: 'complaint' | 'maintenance' | 'sleepover' | 'guest';
     message: string;
-    sentBy: 'admin' | 'student';
     timestamp: Date;
   }[];
 }
@@ -85,22 +88,14 @@ export interface GuestRegistration {
   adminResponse?: string;
 }
 
-export const createUser = async (
-  userData: Omit<UserData, 'createdAt' | 'applicationStatus'> & {
-    requestDetails?: Omit<NonNullable<UserData['requestDetails']>, 'dateSubmitted'>;
-  }
-) => {
+export const createUser = async (userData: Omit<UserData, 'createdAt' | 'updatedAt' | 'communicationLog'>) => {
   const userRef = doc(db, USERS_COLLECTION, userData.id);
   const now = new Date();
   
   await setDoc(userRef, {
     ...userData,
     createdAt: now,
-    applicationStatus: 'pending',
-    requestDetails: userData.requestDetails ? {
-      ...userData.requestDetails,
-      dateSubmitted: now
-    } : undefined,
+    updatedAt: now,
     communicationLog: []
   });
 };
@@ -114,14 +109,11 @@ export const getUserById = async (userId: string) => {
       id: userSnap.id,
       ...data,
       createdAt: data.createdAt.toDate(),
-      requestDetails: data.requestDetails ? {
-        ...data.requestDetails,
-        dateSubmitted: data.requestDetails.dateSubmitted.toDate()
-      } : undefined,
+      updatedAt: data.updatedAt.toDate(),
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
         timestamp: log.timestamp.toDate()
-      }))
+      })) || []
     } as UserData;
   }
   return null;
@@ -136,10 +128,7 @@ export const getAllUsers = async () => {
       id: doc.id,
       ...data,
       createdAt: data.createdAt?.toDate() || new Date(),
-      requestDetails: data.requestDetails ? {
-        ...data.requestDetails,
-        dateSubmitted: data.requestDetails.dateSubmitted?.toDate() || new Date()
-      } : undefined,
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
         timestamp: log.timestamp?.toDate() || new Date()
@@ -158,14 +147,11 @@ export const getPendingApplications = async () => {
       id: doc.id,
       ...data,
       createdAt: data.createdAt.toDate(),
-      requestDetails: data.requestDetails ? {
-        ...data.requestDetails,
-        dateSubmitted: data.requestDetails.dateSubmitted.toDate()
-      } : undefined,
+      updatedAt: data.updatedAt.toDate(),
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
         timestamp: log.timestamp.toDate()
-      }))
+      })) || []
     } as UserData;
   });
 };
@@ -290,7 +276,7 @@ export const getMaintenanceRequests = async () => {
   })) as MaintenanceRequest[];
 };
 
-export const updateComplaintStatus = async (complaintId: string, status: Complaint['status'], adminResponse?: string) => {
+export const modifyComplaintStatus = async (complaintId: string, status: Complaint['status'], adminResponse?: string) => {
   const complaintRef = doc(db, 'complaints', complaintId);
   await updateDoc(complaintRef, {
     status,
@@ -341,3 +327,192 @@ export const getGuestRegistrations = async (userId: string) => {
     updatedAt: doc.data().updatedAt.toDate()
   })) as GuestRegistration[];
 }; 
+
+export const updateRequestStatus = async (requestId: string, status: string) => {
+  const requestRef = doc(db, 'requests', requestId);
+  await updateDoc(requestRef, {
+    status
+  });
+};
+
+export const assignStaffToRequest = async (requestId: string, staffId: string) => {
+  const requestRef = doc(db, 'requests', requestId);
+  await updateDoc(requestRef, {
+    staffId
+  });
+};
+
+export async function getAllComplaints() {
+  const complaintsRef = collection(db, 'complaints');
+  const q = query(complaintsRef, orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+}
+
+export async function updateComplaintStatus(
+  id: string,
+  status: 'pending' | 'in_progress' | 'resolved' | 'rejected',
+  adminResponse?: string
+) {
+  const complaintRef = doc(db, 'complaints', id);
+  await updateDoc(complaintRef, {
+    status,
+    adminResponse,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function assignStaffToComplaint(complaintId: string, staffId: string) {
+  const complaintRef = doc(db, 'complaints', complaintId);
+  await updateDoc(complaintRef, {
+    assignedStaffId: staffId,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function getAllMaintenanceRequests() {
+  const maintenanceRef = collection(db, 'maintenance');
+  const q = query(maintenanceRef, orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+}
+
+export async function updateMaintenanceStatus(
+  id: string,
+  status: 'pending' | 'in_progress' | 'completed' | 'rejected',
+  adminResponse?: string
+) {
+  const maintenanceRef = doc(db, 'maintenance', id);
+  await updateDoc(maintenanceRef, {
+    status,
+    adminResponse,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function assignStaffToMaintenance(maintenanceId: string, staffId: string) {
+  const maintenanceRef = doc(db, 'maintenance', maintenanceId);
+  await updateDoc(maintenanceRef, {
+    assignedStaffId: staffId,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function getAllSleepoverRequests() {
+  const sleepoverRef = collection(db, 'sleepover');
+  const q = query(sleepoverRef, orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+    startDate: doc.data().startDate?.toDate() || new Date(),
+    endDate: doc.data().endDate?.toDate() || new Date(),
+  }));
+}
+
+export async function updateSleepoverStatus(
+  id: string,
+  status: 'pending' | 'approved' | 'rejected',
+  adminResponse?: string
+) {
+  const sleepoverRef = doc(db, 'sleepover', id);
+  await updateDoc(sleepoverRef, {
+    status,
+    adminResponse,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function getAllGuestRequests() {
+  const guestRef = collection(db, 'guest');
+  const q = query(guestRef, orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+}
+
+export async function updateGuestStatus(
+  id: string,
+  status: 'pending' | 'approved' | 'rejected',
+  adminResponse?: string
+) {
+  const guestRef = doc(db, 'guest', id);
+  await updateDoc(guestRef, {
+    status,
+    adminResponse,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+//student api calls
+export async function getAnnouncements() {
+  const announcementsRef = collection(db, 'announcements');
+  const q = query(announcementsRef, orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    title: doc.data().title,
+    content: doc.data().content,
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+}
+
+export async function getMyComplaints(userId:string){
+  const complaintsRef = collection(db, 'complaints');
+  const q = query(complaintsRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+  
+}
+
+export async function getMySleepoverRequests(userId:string){
+  const sleepoverRef = collection(db, 'sleepover');
+  const q = query(sleepoverRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+    startDate: doc.data().startDate?.toDate() || new Date(),
+    endDate: doc.data().endDate?.toDate() || new Date(),
+  }));
+}
+
+export async function getMyGuestRequests(userId:string){
+  const guestRef = collection(db, 'guest');
+  const q = query(guestRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+}
+
+export async function getMyMaintenanceRequests(userId:string){
+  const maintenanceRef = collection(db, 'maintenance');
+  const q = query(maintenanceRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    createdAt: doc.data().createdAt?.toDate() || new Date(),
+  }));
+}
+

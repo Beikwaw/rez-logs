@@ -19,6 +19,8 @@ export interface UserData {
   name?: string;
   role: 'user' | 'admin';
   createdAt: Date;
+  applicationStatus?: string; // added applicationStatus property
+
   // Add any other user fields you need
 }
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from 'lucide-react';
+import { TriangleAlert } from 'lucide-react';
 import { ComplaintForm } from '@/components/forms/ComplaintForm';
 import { useAuth } from '@/context/AuthContext';
 import { getComplaints, type Complaint } from '@/lib/firestore';
@@ -42,16 +42,16 @@ export default function ComplaintsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Complaints</h1>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Complaint
-        </Button>
       </div>
 
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>New Complaint</CardTitle>
+      <div className='flex flex-row w-full gap-5'>
+        <Card className='w-full md:w-[50%]'>
+          <CardHeader className='flex flex-row items-center'>
+            <TriangleAlert className='h-6 w-6'/>
+            <div className='flex flex-col'>
+              <CardTitle className='text-2xl font-bold'>New Complaint</CardTitle>
+              <p className='text-sm text-gray-500'>Submit a new complaint</p>
+            </div>
           </CardHeader>
           <CardContent>
             <ComplaintForm
@@ -61,44 +61,47 @@ export default function ComplaintsPage() {
             />
           </CardContent>
         </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Complaints</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <p className="text-muted-foreground">Loading complaints...</p>
-          ) : complaints.length === 0 ? (
-            <p className="text-muted-foreground">No complaints found.</p>
-          ) : (
-            <div className="space-y-4">
-              {complaints.map((complaint) => (
-                <div
-                  key={complaint.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="space-y-1">
-                    <p className="font-medium">{complaint.title}</p>
-                    <p className="text-sm text-muted-foreground">{complaint.description}</p>
-                    <Badge variant={
-                      complaint.status === 'resolved' ? 'default' :
-                      complaint.status === 'in_progress' ? 'secondary' :
-                      'outline'
-                    }>
-                      {complaint.status}
-                    </Badge>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {format(complaint.createdAt, 'MMM d, yyyy')}
-                  </div>
-                </div>
-              ))}
+        <Card className='w-full md:w-[50%]'>
+          <CardHeader className='flex flex-row items-center'>
+            <TriangleAlert className='h-6 w-6'/>
+            <div className='flex flex-col'>
+              <CardTitle className='text-2xl font-bold'>Your Complaints</CardTitle>
+              <p className='text-sm text-gray-500'>Track the status of your complaints</p>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <p className="text-muted-foreground">Loading complaints...</p>
+            ) : complaints.length === 0 ? (
+              <p className="text-muted-foreground">No complaints found.</p>
+            ) : (
+              <div className="space-y-4">
+                {complaints.map((complaint) => (
+                  <div
+                    key={complaint.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="space-y-1">
+                      <p className="font-medium">{complaint.title}</p>
+                      <p className="text-sm text-muted-foreground">{complaint.description}</p>
+                      <Badge variant={
+                        complaint.status === 'resolved' ? 'default' :
+                        complaint.status === 'in_progress' ? 'secondary' :
+                        'outline'
+                      }>
+                        {complaint.status}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {format(complaint.createdAt, 'MMM d, yyyy')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 } 

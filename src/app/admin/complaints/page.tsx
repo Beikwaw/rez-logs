@@ -1,101 +1,219 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, MoreVertical, AlertCircle } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getAllComplaints, updateComplaintStatus, assignStaffToComplaint } from '@/lib/firestore';
+import { RequestActions } from '@/components/admin/RequestActions';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
 
-export default function ComplaintsManagementPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Complaints Management</h1>
-        <Button>View All Complaints</Button>
+export default function ComplaintsPage() {
+  const [complaints, setComplaints] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [staffList, setStaffList] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, []);
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      const complaintsData = await getAllComplaints();
+      setComplaints(complaintsData);
+    } catch (error) {
+      console.error('Error fetching complaints:', error);
+      toast.error('Failed to fetch complaints');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (id: string, status: boolean, adminResponse?: string) => {
+    try {
+      await modifyComplaintStatus(id, status, adminResponse);
+      await fetchComplaints();
+    } catch (error) {
+      console.error('Error updating complaint status:', error);
+      toast.error('Failed to update complaint status');
+    }
+  };
+
+  const handleAssignStaff = async (id: string, staffId: string) => {
+    try {
+      await assignStaffToComplaint(id, staffId);
+      await fetchComplaints();
+    } catch (error) {
+      console.error('Error assigning staff:', error);
+      toast.error('Failed to assign staff');
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-500';
+      case 'in_progress':
+        return 'bg-blue-500';
+      case 'resolved':
+        return 'bg-green-500';
+      case 'rejected':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
+    );
+  }
 
+  return (
+    <div className="container mx-auto py-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Active Complaints</CardTitle>
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search complaints..." className="pl-8 w-[300px]" />
-            </div>
-          </div>
+          <CardTitle>Complaints Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="h-12 px-4 text-left align-middle font-medium">ID</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">User</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Type</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="p-4">#1234</td>
-                  <td className="p-4">John Doe</td>
-                  <td className="p-4">Noise Complaint</td>
-                  <td className="p-4">
-                    <Badge variant="destructive">Open</Badge>
-                  </td>
-                  <td className="p-4">2024-03-15</td>
-                  <td className="p-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Update Status</DropdownMenuItem>
-                        <DropdownMenuItem>Add Note</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-4">#1235</td>
-                  <td className="p-4">Jane Smith</td>
-                  <td className="p-4">Maintenance</td>
-                  <td className="p-4">
-                    <Badge variant="default">In Progress</Badge>
-                  </td>
-                  <td className="p-4">2024-03-14</td>
-                  <td className="p-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Update Status</DropdownMenuItem>
-                        <DropdownMenuItem>Add Note</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Tabs defaultValue="all">
+            <TabsList>
+              <TabsTrigger value="all">All Complaints</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="in_progress">In Progress</TabsTrigger>
+              <TabsTrigger value="resolved">Resolved</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all" className="space-y-4">
+              {complaints.map((complaint) => (
+                <Card key={complaint.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <h3 className="font-medium">{complaint.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Submitted by {complaint.userName} on {format(complaint.createdAt, 'PPP')}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusColor(complaint.status)}>
+                          {complaint.status.replace('_', ' ')}
+                        </Badge>
+                        <RequestActions
+                          type="complaint"
+                          data={complaint}
+                          onStatusUpdate={handleStatusUpdate}
+                          onAssignStaff={handleAssignStaff}
+                          staffList={staffList}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+            <TabsContent value="pending">
+              {complaints
+                .filter((complaint) => complaint.status === 'pending')
+                .map((complaint) => (
+                  <Card key={complaint.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h3 className="font-medium">{complaint.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Submitted by {complaint.userName} on {format(complaint.createdAt, 'PPP')}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getStatusColor(complaint.status)}>
+                            {complaint.status.replace('_', ' ')}
+                          </Badge>
+                          <RequestActions
+                            type="complaint"
+                            data={complaint}
+                            onStatusUpdate={handleStatusUpdate}
+                            onAssignStaff={handleAssignStaff}
+                            staffList={staffList}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </TabsContent>
+            <TabsContent value="in_progress">
+              {complaints
+                .filter((complaint) => complaint.status === 'in_progress')
+                .map((complaint) => (
+                  <Card key={complaint.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h3 className="font-medium">{complaint.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Submitted by {complaint.userName} on {format(complaint.createdAt, 'PPP')}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getStatusColor(complaint.status)}>
+                            {complaint.status.replace('_', ' ')}
+                          </Badge>
+                          <RequestActions
+                            type="complaint"
+                            data={complaint}
+                            onStatusUpdate={handleStatusUpdate}
+                            onAssignStaff={handleAssignStaff}
+                            staffList={staffList}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </TabsContent>
+            <TabsContent value="resolved">
+              {complaints
+                .filter((complaint) => complaint.status === 'resolved')
+                .map((complaint) => (
+                  <Card key={complaint.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h3 className="font-medium">{complaint.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Submitted by {complaint.userName} on {format(complaint.createdAt, 'PPP')}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getStatusColor(complaint.status)}>
+                            {complaint.status.replace('_', ' ')}
+                          </Badge>
+                          <RequestActions
+                            type="complaint"
+                            data={complaint}
+                            onStatusUpdate={handleStatusUpdate}
+                            onAssignStaff={handleAssignStaff}
+                            staffList={staffList}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
   );
 } 
+
+function modifyComplaintStatus(id: string, status: boolean, adminResponse: string | undefined) {
+  throw new Error('Function not implemented.');
+}

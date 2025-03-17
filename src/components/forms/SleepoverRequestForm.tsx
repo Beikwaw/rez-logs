@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 interface SleepoverRequestFormProps {
   userId: string;
   onSuccess?: () => void;
-  onCancel?: () => void;
 }
 
 interface FormData {
@@ -21,8 +20,8 @@ interface FormData {
   endDate: string;
 }
 
-export function SleepoverRequestForm({ userId, onSuccess, onCancel }: SleepoverRequestFormProps) {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>();
+export function SleepoverRequestForm({ userId, onSuccess }: SleepoverRequestFormProps) {
+  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<FormData>();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const startDate = watch('startDate');
@@ -39,6 +38,7 @@ export function SleepoverRequestForm({ userId, onSuccess, onCancel }: SleepoverR
         status: 'pending'
       });
       toast.success('Sleepover request submitted successfully');
+      reset(); // Reset the form fields
       onSuccess?.();
     } catch (error) {
       console.error('Error submitting sleepover request:', error);
@@ -118,15 +118,13 @@ export function SleepoverRequestForm({ userId, onSuccess, onCancel }: SleepoverR
       </div>
 
       <div className="flex justify-end space-x-2">
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
+        <Button type="button" variant="outline" onClick={() => reset()}>
+          Cancel
+        </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Submitting...' : 'Submit Request'}
         </Button>
       </div>
     </form>
   );
-} 
+}

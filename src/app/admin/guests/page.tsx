@@ -4,27 +4,27 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getAllSleepoverRequests, updateSleepoverStatus } from '@/lib/firestore';
+import { getAllGuestRequests, updateGuestStatus } from '@/lib/firestore';
 import { RequestActions } from '@/components/admin/RequestActions';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
-export default function SleepoverPage() {
-  const [sleepoverRequests, setSleepoverRequests] = useState<any[]>([]);
+export default function GuestPage() {
+  const [guestRequests, setGuestRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSleepoverRequests();
+    fetchGuestRequests();
   }, []);
 
-  const fetchSleepoverRequests = async () => {
+  const fetchGuestRequests = async () => {
     try {
       setLoading(true);
-      const requests = await getAllSleepoverRequests();
-      setSleepoverRequests(requests);
+      const requests = await getAllGuestRequests();
+      setGuestRequests(requests);
     } catch (error) {
-      console.error('Error fetching sleepover requests:', error);
-      toast.error('Failed to fetch sleepover requests');
+      console.error('Error fetching guest requests:', error);
+      toast.error('Failed to fetch guest requests');
     } finally {
       setLoading(false);
     }
@@ -32,11 +32,11 @@ export default function SleepoverPage() {
 
   const handleStatusUpdate = async (id: string, status: string, adminResponse?: string) => {
     try {
-      await updateSleepoverStatus(id, status as any, adminResponse);
-      await fetchSleepoverRequests();
+      await updateGuestStatus(id, status as any, adminResponse);
+      await fetchGuestRequests();
     } catch (error) {
-      console.error('Error updating sleepover status:', error);
-      toast.error('Failed to update sleepover status');
+      console.error('Error updating guest status:', error);
+      toast.error('Failed to update guest status');
     }
   };
 
@@ -65,7 +65,7 @@ export default function SleepoverPage() {
     <div className="container mx-auto py-6">
       <Card>
         <CardHeader>
-          <CardTitle>Sleepover Requests</CardTitle>
+          <CardTitle>Guest Requests</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all">
@@ -76,17 +76,26 @@ export default function SleepoverPage() {
               <TabsTrigger value="rejected">Rejected</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="space-y-4">
-              {sleepoverRequests.map((request) => (
+              {guestRequests.map((request) => (
                 <Card key={request.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                        <h3 className="font-medium">Sleepover Request</h3>
+                        <h3 className="font-medium">Guest Visit Request</h3>
                         <p className="text-sm text-muted-foreground">
                           Guest: {request.guestName}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Period: {format(request.startDate, 'PPP')} - {format(request.endDate, 'PPP')}
+                          Email: {request.guestEmail}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Date: {request.visitDate}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Time: {request.visitTime}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Purpose: {request.purpose}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           Submitted on {format(request.createdAt, 'PPP')}
@@ -97,7 +106,7 @@ export default function SleepoverPage() {
                           {request.status.replace('_', ' ')}
                         </Badge>
                         <RequestActions
-                          type="sleepover"
+                          type="guest"
                           data={request}
                           onStatusUpdate={handleStatusUpdate}
                         />
@@ -108,19 +117,28 @@ export default function SleepoverPage() {
               ))}
             </TabsContent>
             <TabsContent value="pending">
-              {sleepoverRequests
+              {guestRequests
                 .filter((request) => request.status === 'pending')
                 .map((request) => (
                   <Card key={request.id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                          <h3 className="font-medium">Sleepover Request</h3>
+                          <h3 className="font-medium">Guest Visit Request</h3>
                           <p className="text-sm text-muted-foreground">
                             Guest: {request.guestName}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Period: {format(request.startDate, 'PPP')} - {format(request.endDate, 'PPP')}
+                            Email: {request.guestEmail}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Date: {request.visitDate}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Time: {request.visitTime}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Purpose: {request.purpose}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Submitted on {format(request.createdAt, 'PPP')}
@@ -131,7 +149,7 @@ export default function SleepoverPage() {
                             {request.status.replace('_', ' ')}
                           </Badge>
                           <RequestActions
-                            type="sleepover"
+                            type="guest"
                             data={request}
                             onStatusUpdate={handleStatusUpdate}
                           />
@@ -142,19 +160,28 @@ export default function SleepoverPage() {
                 ))}
             </TabsContent>
             <TabsContent value="approved">
-              {sleepoverRequests
+              {guestRequests
                 .filter((request) => request.status === 'approved')
                 .map((request) => (
                   <Card key={request.id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                          <h3 className="font-medium">Sleepover Request</h3>
+                          <h3 className="font-medium">Guest Visit Request</h3>
                           <p className="text-sm text-muted-foreground">
                             Guest: {request.guestName}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Period: {format(request.startDate, 'PPP')} - {format(request.endDate, 'PPP')}
+                            Email: {request.guestEmail}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Date: {request.visitDate}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Time: {request.visitTime}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Purpose: {request.purpose}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Submitted on {format(request.createdAt, 'PPP')}
@@ -165,7 +192,7 @@ export default function SleepoverPage() {
                             {request.status.replace('_', ' ')}
                           </Badge>
                           <RequestActions
-                            type="sleepover"
+                            type="guest"
                             data={request}
                             onStatusUpdate={handleStatusUpdate}
                           />
@@ -176,19 +203,28 @@ export default function SleepoverPage() {
                 ))}
             </TabsContent>
             <TabsContent value="rejected">
-              {sleepoverRequests
+              {guestRequests
                 .filter((request) => request.status === 'rejected')
                 .map((request) => (
                   <Card key={request.id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                          <h3 className="font-medium">Sleepover Request</h3>
+                          <h3 className="font-medium">Guest Visit Request</h3>
                           <p className="text-sm text-muted-foreground">
                             Guest: {request.guestName}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Period: {format(request.startDate, 'PPP')} - {format(request.endDate, 'PPP')}
+                            Email: {request.guestEmail}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Date: {request.visitDate}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Time: {request.visitTime}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Purpose: {request.purpose}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Submitted on {format(request.createdAt, 'PPP')}
@@ -199,7 +235,7 @@ export default function SleepoverPage() {
                             {request.status.replace('_', ' ')}
                           </Badge>
                           <RequestActions
-                            type="sleepover"
+                            type="guest"
                             data={request}
                             onStatusUpdate={handleStatusUpdate}
                           />
