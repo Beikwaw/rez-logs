@@ -41,145 +41,118 @@ export default function StudentPortalPage() {
     } catch (error) {
       console.error('Login error:', error);
       if (error instanceof Error && error.message === 'Invalid user type') {
-        toast.error('This account does not have student privileges');
+        toast.error('Invalid user type');
       } else {
-        toast.error('Invalid credentials. Please try again.');
+        toast.error('Login failed');
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    const auth = getAuth();
+
+    if (!resetEmail) {
+      toast.error('Please enter your email');
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      await sendPasswordResetEmail(auth, resetEmail);
-      setResetMessage('Password reset email sent!');
+      await sendPasswordResetEmail(getAuth(), resetEmail);
+      setResetMessage('Password reset email sent');
+      toast.success('Password reset email sent');
     } catch (error) {
-      if (error instanceof Error) {
-        setResetMessage(`Error: ${error.message}`);
-      } else {
-        setResetMessage('An unknown error occurred');
-      }
+      console.error('Reset password error:', error);
+      toast.error('Failed to send reset email');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md">
-        <Link href="/portals" className="flex items-center text-sm text-gray-500 hover:text-gray-900 mb-6">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to portals
-        </Link>
-        
-        <Card className="w-full">
-          <CardHeader className="space-y-1">
-            <div className="flex justify-center mb-4">
-              <div className="bg-green-600 p-2 rounded-full">
-                <UserCircle className="h-6 w-6 text-white" />
-              </div>
+    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+      <Card className="w-full max-w-md p-8">
+        <CardHeader>
+          <CardTitle>Student Portal</CardTitle>
+          <CardDescription>Login to your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-            <CardTitle className="text-2xl text-center">Student Portal</CardTitle>
-            <CardDescription className="text-center">
-              Enter your credentials to access your student dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="student@example.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <button
-                    type="button"
-                    className="text-xs text-primary hover:underline"
-                    onClick={() => setShowResetPassword(true)}
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="remember"
+                  id="rememberMe"
                   checked={rememberMe}
-                  onCheckedChange={(checked: boolean) => setRememberMe(checked)}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
                 />
-                <Label
-                  htmlFor="remember"
-                  className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Remember me
-                </Label>
+                <Label htmlFor="rememberMe">Remember me</Label>
               </div>
-              <Button 
-                type="submit" 
-                className="w-full bg-green-600 hover:bg-green-700" 
-                disabled={isLoading}
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => setShowResetPassword(!showResetPassword)}
               >
-                {isLoading ? 'Logging in...' : 'Login'}
+                Forgot password?
               </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex flex-col items-center gap-2">
-            <div className="text-sm text-gray-500">
-              Don't have an account?
             </div>
-            <div className="text-sm">
-              <Link href="/register" className="text-green-600 hover:underline">
-                Register for student accommodation
-              </Link>
-            </div>
-          </CardFooter>
-        </Card>
-
-        {showResetPassword && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h2 className="text-xl mb-4 text-center">Forgot Password?</h2>
-              <form onSubmit={handlePasswordReset} className="flex flex-col items-center space-y-4">
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </form>
+          {showResetPassword && (
+            <form onSubmit={handleResetPassword} className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="resetEmail">Reset Email</Label>
                 <Input
+                  id="resetEmail"
                   type="email"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="p-2 border rounded"
                   required
                 />
-                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-                  Reset Password
-                </Button>
-              </form>
-              {resetMessage && <p className="mt-4 text-center">{resetMessage}</p>}
-              <Button
-                type="button"
-                className="mt-4 w-full bg-gray-600 hover:bg-gray-700"
-                onClick={() => setShowResetPassword(false)}
-              >
-                Close
+              </div>
+              <Button type="submit" className="w-full">
+                Send Reset Email
               </Button>
-            </div>
-          </div>
-        )}
-      </div>
+              {resetMessage && <p className="text-sm text-green-600">{resetMessage}</p>}
+            </form>
+          )}
+        </CardContent>
+        <CardFooter className="flex items-center justify-between">
+          <Link href="/register">
+            <Button variant="link">Create an account</Button>
+          </Link>
+          <Link href="/">
+            <Button variant="link" className="flex items-center space-x-2">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to home</span>
+            </Button>
+          </Link>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

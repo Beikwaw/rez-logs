@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Poppins } from 'next/font/google'
 import { AuthProvider } from '@/context/AuthContext'
-import {Toaster} from '@/components/ui/sonner'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const poppins = Poppins({
@@ -14,7 +14,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "MDO Student Living",
-  description: "A modern student living management applicationp",
+  description: "A modern student living management application",
 };
 
 export default function RootLayout({
