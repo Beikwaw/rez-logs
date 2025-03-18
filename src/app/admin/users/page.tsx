@@ -115,6 +115,7 @@ export default function UsersPage() {
                 <Button
                   variant="destructive"
                   size="sm"
+                  className='bg-destructive hover:bg-destructive/90 text-white'
                   disabled={!!processingId || user.applicationStatus === 'denied'}
                   onClick={() => handleProcessApplication(user.id, 'denied')}
                 >
@@ -127,6 +128,7 @@ export default function UsersPage() {
                 <Button
                   variant="default"
                   size="sm"
+                  className='bg-green-900 hover:bg-green-800 text-white'
                   disabled={!!processingId || user.applicationStatus === 'accepted'}
                   onClick={() => handleProcessApplication(user.id, 'accepted')}
                 >

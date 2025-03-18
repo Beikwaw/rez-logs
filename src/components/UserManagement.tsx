@@ -65,6 +65,12 @@ export default function UserManagement() {
       await createUser({
         ...newUser,
         id: userId,
+        surname: newUser.name || '', // Using name as surname if not provided
+        place_of_study: '', // Default empty string
+        room_number: '', // Default empty string
+        tenant_code: '', // Default empty string
+        phone: '', // Default empty string
+        requestDetails: undefined // Optional field
       });
       
       toast.success(`User ${newUser.name} created successfully`);

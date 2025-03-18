@@ -163,11 +163,11 @@ export const getPendingApplications = async () => {
     return {
       id: doc.id,
       ...data,
-      createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
-        timestamp: log.timestamp.toDate()
+        timestamp: log.timestamp?.toDate() || new Date()
       })) || []
     } as UserData;
   });
@@ -177,11 +177,11 @@ export const getPendingApplications = async () => {
     return {
       id: doc.id,
       ...data,
-      createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
-        timestamp: log.timestamp.toDate()
+        timestamp: log.timestamp?.toDate() || new Date()
       })) || []
     } as UserData;
   });
