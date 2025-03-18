@@ -153,16 +153,6 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Recent Activity (Last 24 Hours) */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Recent Activity (24 Hours)</h2>
-        <RecentActivity
-          pendingApplications={pendingApplications}
-          complaints={complaints}
-          sleepoverRequests={sleepoverRequests}
-          maintenanceRequests={maintenanceRequests}
-        />
-      </div>
 
       {/* Latest Requests */}
       <div className="space-y-4">
