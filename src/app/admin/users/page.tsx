@@ -38,8 +38,29 @@ export default function UsersPage() {
     try {
       setProcessingId(userId);
       const message = `Your application has been ${status}`;
-      await processRequest(userId, status, message, user.uid || '');
+      
+      // If accepting, update both status and role
+      if (status === 'accepted') {
+        const targetUser = users.find(u => u.id === userId);
+        if (targetUser && targetUser.role === 'newbie') {
+          await updateUser(userId, { 
+            applicationStatus: status,
+            role: 'student',
+            communicationLog: [{
+              message,
+              sentBy: 'admin',
+              timestamp: new Date()
+            }]
+          });
+        } else {
+          await processRequest(userId, status, message, user.uid || '');
+        }
+      } else {
+        await processRequest(userId, status, message, user.uid || '');
+      }
+      
       toast.success(`The application has been ${status} successfully.`);
+      
       await fetchUsers();
     } catch (error) {
       console.error('Error processing application:', error);
@@ -64,8 +85,67 @@ export default function UsersPage() {
     }
   };
 
+  const NewbieUsers = () => {
+    const newbieUsers = users.filter(user => user.role === 'newbie');
+    
+    if (newbieUsers.length === 0) {
+      return (
+        <div className="text-center py-8 text-muted-foreground">
+          No pending newbie applications
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {newbieUsers.map(user => (
+          <Card key={user.id}>
+            <CardContent className="flex items-center justify-between p-4">
+              <div>
+                <h3 className="font-medium">{user.name || user.email}</h3>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <div className="text-sm text-muted-foreground mt-2">
+                  <p>Phone: {user.phone || 'N/A'}</p>
+                  <p>Tenant Code: {user.tenant_code || 'N/A'}</p>
+                  <p>Status: {user.applicationStatus || 'pending'}</p>
+                  <p>Submitted: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={!!processingId || user.applicationStatus === 'denied'}
+                  onClick={() => handleProcessApplication(user.id, 'denied')}
+                >
+                  {processingId === user.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Reject'
+                  )}
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  disabled={!!processingId || user.applicationStatus === 'accepted'}
+                  onClick={() => handleProcessApplication(user.id, 'accepted')}
+                >
+                  {processingId === user.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Approve'
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
   const PendingApplications = () => {
-    const pendingUsers = users.filter(user => user.applicationStatus === 'pending');
+    const pendingUsers = users.filter(user => user.applicationStatus === 'pending' && user.role !== 'newbie');
     
     if (pendingUsers.length === 0) {
       return (
@@ -145,7 +225,15 @@ export default function UsersPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                  <Badge 
+                    variant={
+                      user.role === 'admin' 
+                        ? 'default' 
+                        : user.role === 'newbie' 
+                          ? 'outline' 
+                          : 'secondary'
+                    }
+                  >
                     {user.role}
                   </Badge>
                 </td>
@@ -163,18 +251,33 @@ export default function UsersPage() {
                   </Badge>
                 </td>
                 <td className="px-6 py-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!!processingId}
-                    onClick={() => handleToggleAdminRole(user.id, user.role)}
-                  >
-                    {processingId === user.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      `Make ${user.role === 'admin' ? 'Student' : 'Admin'}`
-                    )}
-                  </Button>
+                  {user.role !== 'newbie' ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={!!processingId}
+                      onClick={() => handleToggleAdminRole(user.id, user.role)}
+                    >
+                      {processingId === user.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        `Make ${user.role === 'admin' ? 'Student' : 'Admin'}`
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={!!processingId || user.applicationStatus !== 'accepted'}
+                      onClick={() => updateUser(user.id, { role: 'student' })}
+                    >
+                      {processingId === user.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Convert to Student'
+                      )}
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -199,11 +302,15 @@ export default function UsersPage() {
           <CardTitle>User Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="pending">
+          <Tabs defaultValue="newbies">
             <TabsList>
+              <TabsTrigger value="newbies">New Registrations</TabsTrigger>
               <TabsTrigger value="pending">Pending Applications</TabsTrigger>
               <TabsTrigger value="all">All Users</TabsTrigger>
             </TabsList>
+            <TabsContent value="newbies" className="mt-4">
+              <NewbieUsers />
+            </TabsContent>
             <TabsContent value="pending" className="mt-4">
               <PendingApplications />
             </TabsContent>

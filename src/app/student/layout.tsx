@@ -13,7 +13,7 @@ import { ChatDialog } from '@/components/ChatDialog';
 import { ApplicantDetails } from '@/components/ApplicantDetails';
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
-  const { user, userData: rawUserData, logout } = useAuth();
+  const { user, userData: rawUserData, logout, loading } = useAuth();
   const userData = rawUserData ? { ...rawUserData, applicationStatus: (rawUserData.applicationStatus as 'pending' | 'accepted' | 'denied') || 'pending' } : null;
   const router = useRouter();
   const pathname = usePathname();
@@ -22,8 +22,22 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const [showApplicantDetails, setShowApplicantDetails] = useState(false);
 
   useEffect(() => {
-    if (!user || (userData && userData.role !== 'student')) {
+    // If user is not logged in, redirect to login
+    if (!loading && !user) {
       router.push('/portals/student');
+      return;
+    }
+
+    // If user is a newbie, redirect to pending approval page
+    if (!loading && userData && userData.role === 'newbie') {
+      router.push('/pending-approval');
+      return;
+    }
+
+    // If user is not a student (e.g. admin), redirect to login
+    if (!loading && userData && userData.role !== 'student') {
+      router.push('/portals/student');
+      return;
     }
 
     const handleResize = () => {
@@ -34,7 +48,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [user, userData, router]);
+  }, [user, userData, loading, router]);
 
   if (!userData) {
     return (

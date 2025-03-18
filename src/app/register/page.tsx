@@ -10,9 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Home, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { app } from "@/lib/firebase";
+import { createUser } from "@/lib/firestore";
+import { toast as sonnerToast } from "sonner";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -21,13 +22,13 @@ export default function SignUpPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const auth = getAuth(app);
-  const db = getFirestore(app);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
-    full_name: "",
+    name: "",
+    surname: "",
     phone: "",
     place_of_study: "",
     room_number: "",
@@ -41,8 +42,8 @@ export default function SignUpPage() {
 
   const validateForm = () => {
     // Email validation
-    if (!formData.email.endsWith("@gmail.com")) {
-      setError("Please enter a valid Gmail address");
+    if (!formData.email.includes("@")) {
+      setError("Please enter a valid email address");
       return false;
     }
 
@@ -75,23 +76,22 @@ export default function SignUpPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCredential.user;
 
-      // Create profile in Firestore
-      const profileData = {
-        id: user.uid,
+      // Create profile in Firestore using our function
+      await createUser({
+        id: user.uid, // Firebase Auth UID
         email: formData.email,
-        full_name: formData.full_name,
+        name: formData.name,
+        surname: formData.surname,
         phone: formData.phone,
         place_of_study: formData.place_of_study,
         room_number: formData.room_number,
         tenant_code: formData.tenant_code,
-        role: "new-student", // Default role
-        status: "pending", // Default status
-      };
-
-      await setDoc(doc(db, "users", user.uid), profileData);
+        role: "newbie", // Default role for new registrations
+        applicationStatus: "pending", // Default status
+      });
 
       setSuccess(true);
-      toast.success("Account created successfully. You can now log in with your credentials");
+      sonnerToast.success("Account created successfully. Your application has been submitted for approval.");
 
       // Redirect after 3 seconds
       setTimeout(() => {
@@ -128,13 +128,14 @@ export default function SignUpPage() {
                 <div className="mx-auto bg-green-100 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4 animate-pulse-slow">
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
-                <CardTitle className="text-2xl">Account Created!</CardTitle>
+                <CardTitle className="text-2xl">Registration Successful!</CardTitle>
                 <CardDescription>
-                  Your account has been created successfully. You will be redirected to the login page shortly.
+                  Your registration has been submitted and is pending approval by an administrator.
+                  You can log in now to check your application status.
                 </CardDescription>
               </CardHeader>
               <CardFooter className="flex justify-center">
-                <Link href="/login">
+                <Link href="/portals/student">
                   <Button className="bg-primary hover:bg-primary/90">Go to Login</Button>
                 </Link>
               </CardFooter>
@@ -155,12 +156,12 @@ export default function SignUpPage() {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Gmail Account</Label>
+                    <Label htmlFor="email">Email Address</Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="your.name@gmail.com"
+                      placeholder="your.name@example.com"
                       value={formData.email}
                       onChange={handleChange}
                       required
@@ -168,17 +169,27 @@ export default function SignUpPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name</Label>
+                    <Label htmlFor="name">First Name</Label>
                     <Input
-                      id="full_name"
-                      name="full_name"
-                      placeholder="John Doe"
-                      value={formData.full_name}
+                      id="name"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
                       required
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="surname">Last Name</Label>
+                    <Input
+                      id="surname"
+                      name="surname"
+                      value={formData.surname}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
@@ -254,16 +265,16 @@ export default function SignUpPage() {
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Creating Account..." : "Sign Up"}
+                    {loading ? "Registering..." : "Register"}
                   </Button>
-                  <p className="text-center text-sm text-muted-foreground">
-                    Already have an account?{" "}
-                    <Link href="/login" className="text-primary hover:underline">
-                      Sign in
-                    </Link>
-                  </p>
                 </CardFooter>
               </form>
+              <CardFooter className="flex justify-center border-t pt-4 text-sm">
+                Already have an account?{" "}
+                <Link href="/portals/student" className="ml-1 text-primary hover:underline">
+                  Log in
+                </Link>
+              </CardFooter>
             </Card>
           )}
         </div>

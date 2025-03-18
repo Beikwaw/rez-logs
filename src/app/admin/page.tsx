@@ -19,6 +19,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, AlertCircle, Calendar, Wrench, CheckCircle, XCircle } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { format } from 'date-fns';
+import { RecentActivity } from '@/components/admin/RecentActivity';
+import { LatestRequests } from '@/components/admin/LatestRequests';
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -79,6 +81,7 @@ export default function AdminDashboardPage() {
     return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
+  const applicationsPending = pendingApplications.length;
   const pendingComplaints = complaints.filter(c => c.status === 'pending').length;
   const pendingSleepovers = sleepoverRequests.filter(r => r.status === 'pending').length;
   const pendingMaintenance = maintenanceRequests.filter(r => r.status === 'pending').length;
@@ -97,7 +100,7 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingApplications.length}</div>
+            <div className="text-2xl font-bold">{applicationsPending}</div>
             <p className="text-xs text-muted-foreground">
               New student applications
             </p>
@@ -150,7 +153,29 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Main Content Tabs */}
+      {/* Recent Activity (Last 24 Hours) */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Recent Activity (24 Hours)</h2>
+        <RecentActivity
+          pendingApplications={pendingApplications}
+          complaints={complaints}
+          sleepoverRequests={sleepoverRequests}
+          maintenanceRequests={maintenanceRequests}
+        />
+      </div>
+
+      {/* Latest Requests */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Latest Requests</h2>
+        <LatestRequests
+          pendingApplications={pendingApplications}
+          complaints={complaints}
+          sleepoverRequests={sleepoverRequests}
+          maintenanceRequests={maintenanceRequests}
+        />
+      </div>
+
+      {/* Latest Content Tabs */}
       <Tabs defaultValue="sleepover" className="space-y-4">
         <TabsList>
           <TabsTrigger value="sleepover">Sleepover Requests</TabsTrigger>

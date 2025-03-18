@@ -24,20 +24,21 @@ export default function StudentPortalPage() {
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-    
     setIsLoading(true);
-    
+
     try {
-      await login(email, password, 'student', rememberMe);
-      toast.success('Login successful');
-      router.push('/student');
+      const userData = await login(email, password, 'student', rememberMe);
+      if (userData.role === 'newbie') {
+        toast.success('Login successful');
+        router.push('/pending-approval');
+      } else if (userData.role === 'student') {
+        toast.success('Login successful');
+        router.push('/student');
+      } else {
+        toast.error('Invalid user type');
+      }
     } catch (error) {
       console.error('Login error:', error);
       if (error instanceof Error && error.message === 'Invalid user type') {
@@ -80,7 +81,7 @@ export default function StudentPortalPage() {
           <CardDescription>Login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

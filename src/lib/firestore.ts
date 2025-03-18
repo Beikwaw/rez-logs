@@ -22,12 +22,15 @@ export interface UserData {
   id: string;
   email: string;
   name?: string;
+  surname: string;
   phone?: string;
-  role: 'student' | 'admin';
+  role: 'student' | 'admin' | 'newbie';
   createdAt: Date;
   updatedAt: Date;
   applicationStatus?: 'accepted' | 'denied' | 'pending';
-  roomNumber?: string;
+  place_of_study: string;
+  room_number: string;
+  tenant_code: string;
   requestDetails?: {
     accommodationType: string;
     location: string;
@@ -110,11 +113,11 @@ export const getUserById = async (userId: string) => {
     return {
       id: userSnap.id,
       ...data,
-      createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
       communicationLog: data.communicationLog?.map((log: any) => ({
         ...log,
-        timestamp: log.timestamp.toDate()
+        timestamp: log.timestamp?.toDate() || new Date()
       })) || []
     } as UserData;
   }
@@ -141,9 +144,21 @@ export const getAllUsers = async () => {
 
 export const getPendingApplications = async () => {
   const usersRef = collection(db, USERS_COLLECTION);
-  const pendingQuery = query(usersRef, where('applicationStatus', '==', 'pending'));
-  const pendingSnap = await getDocs(pendingQuery);
-  return pendingSnap.docs.map(doc => {
+  const pendingQuery = query(
+    usersRef, 
+    where('applicationStatus', '==', 'pending')
+  );
+  const newbieQuery = query(
+    usersRef,
+    where('role', '==', 'newbie')
+  );
+
+  const [pendingSnap, newbieSnap] = await Promise.all([
+    getDocs(pendingQuery),
+    getDocs(newbieQuery)
+  ]);
+
+  const pendingUsers = pendingSnap.docs.map(doc => {
     const data = doc.data();
     return {
       id: doc.id,
@@ -156,6 +171,28 @@ export const getPendingApplications = async () => {
       })) || []
     } as UserData;
   });
+
+  const newbieUsers = newbieSnap.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt.toDate(),
+      updatedAt: data.updatedAt.toDate(),
+      communicationLog: data.communicationLog?.map((log: any) => ({
+        ...log,
+        timestamp: log.timestamp.toDate()
+      })) || []
+    } as UserData;
+  });
+
+  // Combine both arrays and remove duplicates based on id
+  const allPending = [...pendingUsers, ...newbieUsers];
+  const uniquePending = allPending.filter((user, index, self) =>
+    index === self.findIndex((u) => u.id === user.id)
+  );
+
+  return uniquePending;
 };
 
 export const processRequest = async (
@@ -169,10 +206,11 @@ export const processRequest = async (
 
   await updateDoc(userRef, {
     applicationStatus: status,
+    updatedAt: now,
     communicationLog: arrayUnion({
       message,
       sentBy: 'admin',
-      timestamp: Timestamp.fromDate(now)
+      timestamp: now
     })
   });
 };
