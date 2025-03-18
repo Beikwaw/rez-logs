@@ -81,23 +81,7 @@ export function RequestActions({
     }
   };
 
-  const handleAssignStaff = async () => {
-    if (!selectedStaff) {
-      toast.error('Please select a staff member');
-      return;
-    }
-    try {
-      setLoading(true);
-      await onAssignStaff?.(data.id, selectedStaff);
-      toast.success('Staff assigned successfully');
-      setOpen(false);
-    } catch (error) {
-      console.error('Error assigning staff:', error);
-      toast.error('Failed to assign staff');
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const renderDetails = () => {
     switch (type) {
@@ -218,31 +202,6 @@ export function RequestActions({
           </div>
         </ScrollArea>
         <div className="flex flex-col gap-4 mt-4">
-          {onAssignStaff && (
-            <div className="space-y-2">
-              <h3 className="font-medium">Assign Staff</h3>
-              <select
-                className="w-full p-2 border rounded-md"
-                value={selectedStaff}
-                onChange={(e) => setSelectedStaff(e.target.value)}
-              >
-                <option value="">Select staff member</option>
-                {staffList.map((staff) => (
-                  <option key={staff.id} value={staff.id}>
-                    {staff.name}
-                  </option>
-                ))}
-              </select>
-              <Button
-                className="w-full"
-                onClick={handleAssignStaff}
-                disabled={loading}
-              >
-                <UserPlus className="h-4 w-4 mr-2 text-purple-500" />
-                Assign Staff
-              </Button>
-            </div>
-          )}
           <div className="flex gap-2">
             <Button
               variant="outline"

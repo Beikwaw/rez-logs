@@ -1,28 +1,27 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Home, CheckCircle, AlertCircle } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
-import { getFirestore, doc, setDoc } from "firebase/firestore"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { app } from "@/lib/firebase"
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Home, CheckCircle, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { app } from "@/lib/firebase";
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const auth = getAuth(app)
-  const db = getFirestore(app)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -33,48 +32,48 @@ export default function SignUpPage() {
     place_of_study: "",
     room_number: "",
     tenant_code: "",
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const validateForm = () => {
     // Email validation
     if (!formData.email.endsWith("@gmail.com")) {
-      setError("Please enter a valid Gmail address")
-      return false
+      setError("Please enter a valid Gmail address");
+      return false;
     }
 
     // Password validation
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters")
-      return false
+      setError("Password must be at least 8 characters");
+      return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return false
+      setError("Passwords do not match");
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     if (!validateForm()) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
 
     try {
       // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
-      const user = userCredential.user
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
 
       // Create profile in Firestore
       const profileData = {
@@ -87,24 +86,24 @@ export default function SignUpPage() {
         tenant_code: formData.tenant_code,
         role: "new-student", // Default role
         status: "pending", // Default status
-      }
+      };
 
-      await setDoc(doc(db, "users", user.uid), profileData)
+      await setDoc(doc(db, "users", user.uid), profileData);
 
-      setSuccess(true)
-      toast.success("Account created successfully. You can now log in with your credentials")
+      setSuccess(true);
+      toast.success("Account created successfully. You can now log in with your credentials");
 
       // Redirect after 3 seconds
       setTimeout(() => {
-        router.push("/portals/student")
-      }, 3000)
+        router.push("/portals/student");
+      }, 3000);
     } catch (error: any) {
-      console.error("Signup error:", error)
-      setError(error.message || "Failed to create account")
+      console.error("Signup error:", error);
+      setError(error.message || "Failed to create account");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -278,5 +277,5 @@ export default function SignUpPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

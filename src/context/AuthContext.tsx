@@ -42,12 +42,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
-            // Ensure dates are properly serialized
-            const serializedData: UserData = {
+            const serializedData = {
               id: user.uid,
-              email: user.email!,
-              name: data.name,
-              role: data.role,
+              email: user.email || '',
+              name: data.name || '',
+              phone: data.phone || '',
+              roomNumber: data.roomNumber || '',
+              department: data.department || '',
+              level: data.level || '',
+              matricNumber: data.matricNumber || '',
+              role: data.role || 'student',
               createdAt: data.createdAt?.toDate() || new Date(),
               updatedAt: data.updatedAt?.toDate() || new Date(),
               applicationStatus: data.applicationStatus,
@@ -58,8 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               communicationLog: data.communicationLog?.map((log: any) => ({
                 ...log,
                 timestamp: log.timestamp?.toDate() || new Date()
-              }))
-            };
+              })) || []
+            } as UserData;
+            
             setUserData(serializedData);
             
             // Set cookies if they don't exist (for persistent login)
@@ -98,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       await createUser({
         id: user.uid,
-        email: user.email!,
+        email: user.email || '',
         name,
         role,
         requestDetails: requestDetails ? {
@@ -129,11 +134,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Set user data in state
-      const serializedData: UserData = {
+      const serializedData = {
         id: user.uid,
-        email: user.email!,
-        name: data.name,
-        role: data.role,
+        email: user.email || '',
+        name: data.name || '',
+        phone: data.phone || '',
+        roomNumber: data.roomNumber || '',
+        department: data.department || '',
+        level: data.level || '',
+        matricNumber: data.matricNumber || '',
+        role: data.role || 'student',
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         applicationStatus: data.applicationStatus,
@@ -144,8 +154,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         communicationLog: data.communicationLog?.map((log: any) => ({
           ...log,
           timestamp: log.timestamp?.toDate() || new Date()
-        }))
-      };
+        })) || []
+      } as UserData;
+      
       setUserData(serializedData);
 
       // Set cookies with appropriate expiration
