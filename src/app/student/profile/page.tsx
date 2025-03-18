@@ -20,7 +20,7 @@ export default function StudentProfilePage() {
     name: '',
     email: '',
     phone: '',
-    roomNumber: '',
+    room_number: '',
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function StudentProfilePage() {
             name: userData.name || '',
             email: userData.email || '',
             phone: userData.phone || '',
-            roomNumber: userData.roomNumber || '',
+            room_number: userData.room_number || '',
           });
         }
       } catch (error) {
@@ -123,9 +123,9 @@ export default function StudentProfilePage() {
               <div className="space-y-2">
                 <Label htmlFor="roomNumber">Room Number</Label>
                 <Input
-                  id="roomNumber"
-                  name="roomNumber"
-                  value={formData.roomNumber}
+                  id="room_number"
+                  name="room_number"
+                  value={formData.room_number}
                   onChange={handleChange}
                   required
                 />
