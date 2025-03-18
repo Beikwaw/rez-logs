@@ -35,36 +35,97 @@ export default function SignUpPage() {
     tenant_code: "",
   });
 
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [errorField, setErrorField] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: typeof formData) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev: typeof fieldErrors) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    let hasError = false;
+
     // Email validation
     if (!formData.email.includes("@")) {
-      setError("Please enter a valid email address");
-      return false;
+      errors.email = "Please enter a valid email address";
+      hasError = true;
     }
 
     // Password validation
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return false;
+      errors.password = "Password must be at least 8 characters";
+      hasError = true;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return false;
+      errors.confirmPassword = "Passwords do not match";
+      hasError = true;
     }
 
-    return true;
+    // Name validation
+    if (!formData.name.trim()) {
+      errors.name = "First name is required";
+      hasError = true;
+    }
+
+    // Surname validation
+    if (!formData.surname.trim()) {
+      errors.surname = "Last name is required";
+      hasError = true;
+    }
+
+    // Phone validation
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required";
+      hasError = true;
+    }
+
+    // Place of study validation
+    if (!formData.place_of_study.trim()) {
+      errors.place_of_study = "Place of study is required";
+      hasError = true;
+    }
+
+    // Room number validation
+    if (!formData.room_number.trim()) {
+      errors.room_number = "Room number is required";
+      hasError = true;
+    }
+
+    // Tenant code validation
+    if (!formData.tenant_code.trim()) {
+      errors.tenant_code = "Tenant code is required";
+      hasError = true;
+    }
+
+    setFieldErrors(errors);
+
+    if (hasError) {
+      // Find the first field with an error
+      const firstErrorField = Object.keys(errors)[0];
+      setErrorField(firstErrorField);
+      // Focus the first error field
+      const element = document.getElementById(firstErrorField);
+      if (element) {
+        element.focus();
+      }
+    }
+
+    return !hasError;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setFieldErrors({});
+    setErrorField(null);
 
     if (!validateForm()) {
       setLoading(false);
@@ -78,7 +139,7 @@ export default function SignUpPage() {
 
       // Create profile in Firestore using our function
       await createUser({
-        id: user.uid, // Firebase Auth UID
+        id: user.uid,
         email: formData.email,
         name: formData.name,
         surname: formData.surname,
@@ -86,12 +147,17 @@ export default function SignUpPage() {
         place_of_study: formData.place_of_study,
         room_number: formData.room_number,
         tenant_code: formData.tenant_code,
-        role: "newbie", // Default role for new registrations
-        applicationStatus: "pending", // Default status
+        role: "newbie",
+        applicationStatus: "pending",
       });
 
       setSuccess(true);
-      sonnerToast.success("Account created successfully. Your application has been submitted for approval.");
+      sonnerToast.success(
+        `Thank you for successfully signing up, ${formData.name}! Your account is being reviewed by management and will be approved within 48 hours. Kindly contact management if it is not resolved within 48 hours.`,
+        {
+          duration: 5000,
+        }
+      );
 
       // Redirect after 3 seconds
       setTimeout(() => {
@@ -165,7 +231,11 @@ export default function SignUpPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.email ? "border-red-500" : ""}
                     />
+                    {fieldErrors.email && (
+                      <p className="text-sm text-red-500">{fieldErrors.email}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -176,7 +246,11 @@ export default function SignUpPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.name ? "border-red-500" : ""}
                     />
+                    {fieldErrors.name && (
+                      <p className="text-sm text-red-500">{fieldErrors.name}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -187,7 +261,11 @@ export default function SignUpPage() {
                       value={formData.surname}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.surname ? "border-red-500" : ""}
                     />
+                    {fieldErrors.surname && (
+                      <p className="text-sm text-red-500">{fieldErrors.surname}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -199,7 +277,11 @@ export default function SignUpPage() {
                       value={formData.password}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.password ? "border-red-500" : ""}
                     />
+                    {fieldErrors.password && (
+                      <p className="text-sm text-red-500">{fieldErrors.password}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -211,7 +293,11 @@ export default function SignUpPage() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.confirmPassword ? "border-red-500" : ""}
                     />
+                    {fieldErrors.confirmPassword && (
+                      <p className="text-sm text-red-500">{fieldErrors.confirmPassword}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -224,7 +310,11 @@ export default function SignUpPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.phone ? "border-red-500" : ""}
                     />
+                    {fieldErrors.phone && (
+                      <p className="text-sm text-red-500">{fieldErrors.phone}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -236,7 +326,11 @@ export default function SignUpPage() {
                       value={formData.place_of_study}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.place_of_study ? "border-red-500" : ""}
                     />
+                    {fieldErrors.place_of_study && (
+                      <p className="text-sm text-red-500">{fieldErrors.place_of_study}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -248,7 +342,11 @@ export default function SignUpPage() {
                       value={formData.room_number}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.room_number ? "border-red-500" : ""}
                     />
+                    {fieldErrors.room_number && (
+                      <p className="text-sm text-red-500">{fieldErrors.room_number}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -260,7 +358,11 @@ export default function SignUpPage() {
                       value={formData.tenant_code}
                       onChange={handleChange}
                       required
+                      className={fieldErrors.tenant_code ? "border-red-500" : ""}
                     />
+                    {fieldErrors.tenant_code && (
+                      <p className="text-sm text-red-500">{fieldErrors.tenant_code}</p>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">

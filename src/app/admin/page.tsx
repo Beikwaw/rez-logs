@@ -21,6 +21,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { RecentActivity } from '@/components/admin/RecentActivity';
 import { LatestRequests } from '@/components/admin/LatestRequests';
+import { StudentApplications } from '@/components/admin/StudentApplications';
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -69,6 +70,10 @@ export default function AdminDashboardPage() {
       setError('Failed to process application');
       console.error(err);
     }
+  };
+
+  const handleApplicationProcessed = (userId: string) => {
+    setPendingApplications(prev => prev.filter(app => app.id !== userId));
   };
 
   if (loading) {
@@ -153,6 +158,11 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
+      {/* Student Applications Section */}
+      <StudentApplications 
+        applications={pendingApplications}
+        onApplicationProcessed={handleApplicationProcessed}
+      />
 
       {/* Latest Requests */}
       <div className="space-y-4">
