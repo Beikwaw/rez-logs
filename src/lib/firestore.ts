@@ -284,36 +284,45 @@ export const createMaintenanceRequest = async (request: Omit<MaintenanceRequest,
 export const getComplaints = async () => {
   const complaintsRef = collection(db, 'complaints');
   const complaintsSnap = await getDocs(complaintsRef);
-  return complaintsSnap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt.toDate(),
-    updatedAt: doc.data().updatedAt.toDate()
-  })) as Complaint[];
+  return complaintsSnap.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date()
+    };
+  }) as Complaint[];
 };
 
 export const getSleepoverRequests = async () => {
   const requestsRef = collection(db, 'sleepover_requests');
   const requestsSnap = await getDocs(requestsRef);
-  return requestsSnap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt.toDate(),
-    updatedAt: doc.data().updatedAt.toDate(),
-    startDate: doc.data().startDate.toDate(),
-    endDate: doc.data().endDate.toDate()
-  })) as SleepoverRequest[];
+  return requestsSnap.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+      startDate: data.startDate?.toDate() || new Date(),
+      endDate: data.endDate?.toDate() || new Date()
+    };
+  }) as SleepoverRequest[];
 };
 
 export const getMaintenanceRequests = async () => {
   const requestsRef = collection(db, 'maintenance_requests');
   const requestsSnap = await getDocs(requestsRef);
-  return requestsSnap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt.toDate(),
-    updatedAt: doc.data().updatedAt.toDate()
-  })) as MaintenanceRequest[];
+  return requestsSnap.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date()
+    };
+  }) as MaintenanceRequest[];
 };
 
 export const modifyComplaintStatus = async (complaintId: string, status: Complaint['status'], adminResponse?: string) => {
@@ -360,13 +369,16 @@ export const getGuestRegistrations = async (userId: string) => {
   const registrationsRef = collection(db, 'guest_registrations');
   const registrationsQuery = query(registrationsRef, where('userId', '==', userId));
   const registrationsSnap = await getDocs(registrationsQuery);
-  return registrationsSnap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt.toDate(),
-    updatedAt: doc.data().updatedAt.toDate()
-  })) as GuestRegistration[];
-}; 
+  return registrationsSnap.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date()
+    };
+  }) as GuestRegistration[];
+};
 
 export const updateRequestStatus = async (requestId: string, status: string) => {
   const requestRef = doc(db, 'requests', requestId);

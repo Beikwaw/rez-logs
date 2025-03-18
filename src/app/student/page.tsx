@@ -187,7 +187,7 @@ export default function DashboardPage() {
                     {announcement.content}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {announcement.createdAt.toDate().toLocaleDateString()}
+                    {announcement.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString()}
                   </p>
                 </div>
               ))}
